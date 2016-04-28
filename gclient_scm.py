@@ -364,6 +364,15 @@ class GitWrapper(SCMWrapper):
     # If a dependency is not pinned, track the default remote branch.
     default_rev = 'refs/remotes/%s/master' % self.remote
     url, deps_revision = gclient_utils.SplitUrlRevision(self.url)
+
+    # ppanyukov: hacky hack to support authenticated URIs.
+    # since '@' is used to denote revision we can't use it
+    # with authenticated URIs. E.g. https://user:password@example.com"
+    # would translate to URL: https://user:password, Revision: example.com
+    # Hence we need another char in place of '@'.
+    # Let's say '^' should work.
+    url = url.replace('^', '@')
+
     rev_str = ""
     revision = deps_revision
     managed = True
